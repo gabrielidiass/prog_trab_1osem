@@ -1,0 +1,225 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Vue - listagem, inserção e edição de mapas</title>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    </head> 
+    <body>         
+        <div id="app" class="container">               
+                <h2>Listagem de mapas do CS</h2>   
+
+                <table class="table table-striped" >
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Data de Criação</th>
+                        <th scope="col">Quantidade de Boots</th>
+                        <th scope="col">Quantidade de Rounds</th>
+                                             
+                        <th scope="col">Alterar</th>
+                        <th scope="col">Remover</th>
+                    </tr>                     
+                    <tbody>
+                        <tr v-for="(m, indice) in mapas">                                                
+                            <td>{{indice}}</td>
+                            <td>{{m.nome}}</td>
+                            <td>{{m.data_criacao}}</td>
+                            <td>{{m.qtd_boots}}</td>
+                            <td>{{m.qtd_rounds}}</td>
+                            
+                            <td><button v-on:click="editMapa(indice)" class="btn" type="button">Alterar</button></td>
+                            <td><button v-on:click="remMapa(indice)" class="btn" type="button">Remover</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <form id="formulario">
+                    <!-- passo 2-->
+                    <p v-if="errors.length">
+                        <b>Por favor, corrija o(s) seguinte(s) erro(s):</b>
+                        <ul>
+                          <li v-for="error in errors">{{ error }}</li>
+                        </ul>
+                      </p>
+
+                    <h3>Formulário para cadastrar novo mapa</h3>
+                        <div class="form-group">
+                            <label for="inputIndice">#:</label>
+                            <input type="text" v-model="novo_mapa.indice" class="form-control" id="inputIndice" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputName">Nome:</label>
+                            <input type="text" maxlength="20" v-on:keypress="isLetter($event)" placeholder="Nome do mapa" v-model="novo_mapa.nome" class="form-control" id="inputName">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputDtCria">D. Criação:</label>
+                            <input type="date" v-model="novo_mapa.data_criação" class="form-control" id="inputDtCria"><!--Atividade 2 - Aplicar um input/calendario mais apropriado. -->
+                        </div>
+                        <div class="form-group">
+                            <label for="inputQtdRounds">Quantidade de rounds:</label>
+                            <input type="number" v-model="novo_mapa.qtdrounds" class="form-control" id="inputQtdRounds">
+                        </div>
+                        <!-- https://br.vuejs.org/v2/guide/forms.html -->                        
+                        <div class="form-group">
+                            <label for="selectModo">modo:</label>
+                            <select v-model="novo_mapa.modo" class="form-control" id="selectModo">                                
+                                <option v-for="m in modos" v-bind:value="m">
+                                    {{ m.descricao }}
+                                </option>
+                            </select>
+                        </div>
+
+                    
+                        <button @click="addModo" class="btn btn-primary" type="button">Salvar</button>
+                        <button @click="cleanFormulario" class="btn btn-primary" type="button">Limpar</button>
+                        
+                        </div>                                                                            
+                </form>        
+
+        </div>       
+    </body>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var dados = { 
+                    //utilizado para o select de modos
+                    modos: [{codigo: 1, descricao: 'Terrorista'},{codigo: 2, descricao: 'Antiterrorista'}],
+
+                    //utilizado para listar os mapas na tabela html
+                    mapas:  [ {nome: 'Campanha', data_criação: '2022-01-01', qtdrounds: 2,  modo: {codigo: 2, descricao: 'Antiterrorista'} }], 
+                            
+                    //utilizado para ligar com os inputs do formulário.
+                    novo_mapa: {indice: '', nome: '', data_criação: '', qtdrounds: 0,  modo: {}},
+                   
+                    //passo 1
+                    errors: [],
+            };
+
+            Vue.filter('formataData', function (value) {                
+                //yyyy-mm-dd
+                var data = new Date(value);
+                data.setDate(data.getDate()+1); //incrementa a data em um dia para mostrar corretamente (pode nao ser necessário)              
+                dia  = (data.getDate()).toString().padStart(2, '0'),
+                mes  = (data.getMonth()+1).toString().padStart(2, '0'), //+1 pois no getMonth Janeiro começa com zero.                
+                ano  = data.getFullYear();                
+                return dia+"/"+mes+"/"+ano;                
+            })
+        
+          new Vue({ 
+                el: '#app', 
+                data: dados,
+                methods: { 
+
+                    isLetter(e) {
+                        let char = String.fromCharCode(e.keyCode); // Get the character
+                        if(/^[A-Za-z]+$/.test(char)) 
+                            return true; // Match with regex 
+                        else 
+                            e.preventDefault(); // If not match, don't add to input text
+                    },
+                    //https://br.vuejs.org/v2/cookbook/form-validation.html  
+                    // validação de formulários “à mão”, 
+                    //passo 3
+                    checkForm: function () {
+
+                        this.errors = [];
+
+                        if (this.novo_mapa.nome.trim().length > 3 && 
+                           this.novo_mapa.qtdrounds > 0 &&
+                            this.novo_mapa.qtdrounds < 101 &&
+                            !isNaN(parseInt(this.novo_mapa.modo.codigo))) {
+                            return true;
+                        }
+
+                        if (this.novo_mapa.nome.trim().length <= 3) {
+                            this.errors.push('O nome é obrigatório.');
+                        }
+
+                        if (this.novo_mapa.qtdrounds < 1 || this.novo_mapa.qtdrounds > 100) {
+                            this.errors.push('Quantidade inválida de rounds.');
+                        }                                              
+                        if (isNaN(parseInt(this.novo_mapa.modo.codigo))) {
+                            this.errors.push('O modo é obrigatória.');
+                        }
+                    },
+
+                    addModo: function () {
+                        //passo 4.
+                        if(this.checkForm()){
+
+                            var input_indice = this.novo_mapa.indice;
+                            //documentação sobre o parseInt
+                            //https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/parseInt
+                            if(isNaN(parseInt(input_indice))){
+
+                                this.mapas.push({nome: this.novo_mapa.nome.trim(), 
+                                                 data_criação: this.novo_mapa.data_criação.trim(), 
+                                                 qtdrounds: this.novo_mapa.qtdrounds,
+                                                 modo:this.novo_mapa.modo}
+                                                );
+                                alert('Novo Mapa cadastrado !');
+
+                            }else{
+
+                                this.mapas[input_indice] = {nome: this.novo_mapa.nome.trim(), 
+                                                 data_criação: this.novo_mapa.data_criação.trim(), 
+                                                 qtdrounds: this.novo_mapa.qtdrounds,
+                                                 modo:this.novo_mapa.modo
+                                                };
+
+                                alert('Mapa alterado !');
+                            }
+                            this.cleanFormulario();
+
+                        }//passo 5.
+                    },
+
+                    editMapa: function (param_index) {
+
+                        this.novo_mapa.indice = param_index;
+                        this.novo_mapa.nome = this.mapas[param_index].nome; 
+                        this.novo_mapa.data_criação = this.mapas[param_index].data_criação;
+                        this.novo_mapa.qtdrounds = this.mapas[param_index].qtdrounds;
+                        this.novo_mapa.modo = this.mapas[param_index].modo;
+                    },
+
+                    remMapa: function(param_index){
+                        
+                        var r = confirm("Deseja realmente remover o Mapa " + this.mapas[param_index].nome);
+                        if (r == true) {
+                            
+                            //documentacao sobre o splice
+                            //https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+                            //remove 1 elemento do índice definido pela variavel param_index                        
+                            this.mapas.splice(param_index, 1);
+
+                            alert('Removeu o Mapa. ');
+
+                        } else {
+
+                            alert('O Mapa: ' + this.mapas[param_index].nome + " não foi removido.");
+                        }                        
+                        
+                    },
+                    
+                    cleanFormulario: function() {
+
+                        this.novo_mapa.indice = '';
+                        this.novo_mapa.nome = ''; 
+                        this.novo_mapa.data_criação = '';
+                        this.novo_mapa.qtdrounds = 0;
+                        this.novo_mapa.modo = '';
+                    }
+
+                },
+                created : function () {
+
+                    this.cleanFormulario();
+
+                }
+            }); 
+        });
+
+    </script> 
+   
+ </html>

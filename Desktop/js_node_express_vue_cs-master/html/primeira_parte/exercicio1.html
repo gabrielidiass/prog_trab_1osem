@@ -1,0 +1,144 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Vue - Formulário com Máscaras</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+</head>
+
+<body>
+
+
+    <div id="app" class="container">
+        <h2>Listagem de Jogadores do CS</h2>
+
+        <table class="table table-striped">
+            <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Nome</th>
+                <th scope="col">Data de cadastro</th>
+                <th scope="col">Modo</th>
+                <th scope="col">Situação</th>
+                <th scope="col">Alterar</th>
+                <th scope="col">Remover</th>
+            </tr>
+
+            <tbody>
+                <tr v-for="(m, indice) in mapas">
+                    <td>{{indice}}</td>
+                    <td>{{m.nome}}</td>
+                    <td>{{m.data_cadastro | formataData}}</td>
+                    <td>{{m.modo.nome}}</td>
+                    <td v-if="m.situacao"><input type="checkbox" checked disabled></td>
+                    <td><button v-on:click="editMapa(indice)" class="btn" type="button">Alterar</button></td>
+                    <td><button v-on:click="remMapa(indice)" class="btn" type="button">Remover</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <form id="formulario">
+            <h3>Formulário para cadastrar novo mapa</h3>
+            <div class="form-group">
+                <label for="inputIndice">Código:</label>
+                <input type="text" v-model="novo_mapa.indice" class="form-control" id="inputIndice" disabled>
+            </div>
+            <div class="form-group">
+                <label for="inputnome">Nome:</label>
+                <input type="text" v-model="novo_mapa.nome" class="form-control" id="inputnome">
+            </div>
+            <div class="form-group">
+                <label for="inputdatcadastro">D. Cadastro:</label>
+                <input type="date" v-model="novo_mapa.data_cadastro" class="form-control"
+                    id="inputdatcadastro"><!--Atividade - Aplicar um input/calendario mais apropriado. -->
+            </div>
+            <div class="form-group">
+                <label for="inputModo">Modo:</label>
+                <input type="select" v-model="novo_mapa.modo" class="form-control" id="inputModo">
+            </div>
+
+
+            <button @click="addMapa" class="btn btn-primary" type="button">Salvar</button>
+            <button @click="cleanFormulario" class="btn btn-primary" type="button">Limpar</button>
+
+    </div>
+    </form>
+
+
+    </div>
+
+
+</body>
+
+</html>
+
+
+<script type="text/javascript">
+    $(document).ready(
+        function () {
+            var dados = {
+                mapas: [{ nome: 'mapa teste', data_cadastro: '', modo_nome: '', situacao: '' }
+                ],
+
+                novo_mapa: { indice: '', nome: '', data_cadastro: '', modo_nome: '', situacao: '' }
+            };
+
+            new Vue({
+                el: '#app',
+                data: dados,
+                methods: {
+                    addMapa: function () {
+                        var input_indice = this.novo_mapa.indice;
+                        var input_nome = this.novo_mapa.nome.trim();
+                        var input_data_cadastro = this.novo_mapa.data_cadastro.trim();
+                        var input_modo_nome = this.novo_mapa.modo_nome;
+                        var input_situacao = this.novo_mapa.situacao;
+
+
+                        // if (input_nome.length > 3 && input_modo > -1) {
+
+                        //     //documentação sobre o parseInt
+                        //     //https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/parseInt
+                        //     if (isNaN(parseInt(input_indice))) {
+
+                        //         this.mapas.push({
+                        //             nome: input_nome,
+                        //             data_cadastro: input_data_cadastro,
+                        //             modo_nome: input_modo_nome,
+                        //             situacao: input_situacao,
+                        //         }
+                        //         );
+                        //         alert('Novo Mapa cadastrado !');
+
+                        //     } else {
+
+                        //         this.mapas[input_indice] = {
+                        //             nome: input_nome,
+                        //             data_cadastro: input_data_cadastro,
+                        //             modo_nome: input_modo_nome,
+                        //             situacao: input_situacao,
+                        //         };
+
+                        //         alert('Mapa alterado !');
+                        //     }
+                        //     this.cleanFormulario();
+
+                        // } else {
+
+                        //     alert("Preencha todos");
+                        // }
+                    },
+                    editMapa: function (param_index) {
+
+                    },
+                    remMapa: function (param_index) {
+
+
+                    }
+                }
+
+            }
+            )
+        })

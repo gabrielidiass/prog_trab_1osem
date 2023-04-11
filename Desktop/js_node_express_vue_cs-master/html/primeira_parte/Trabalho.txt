@@ -1,0 +1,34 @@
+Criar uma tabela para mapa 
+criar uma tabela para local 
+criar uma tabela que relacione mapa com local
+
+TRBAALHO GERAL
+
+  <link href="css/estilos.css" rel="stylesheet" />
+  referenciar a fonte por uma class "minha fonte" que esta no css
+
+
+  
+tabela de locais 
+nome            situação
+cria o form para adicionar um local 
+    Nome
+    situação
+*criar um disclaimer: "os locais são necessarios na criação de novos mapas (linka com a página de mapas)"
+
+
+tabela de mapas
+nome            data de cadastro            data de cadastro            local 
+cria um form pra adicionar mapa 
+    dentro, teremos um campo para adiconar locais os quais adicionamos no local
+    nome 
+    data_cadastro
+    situação
+    local 
+        select local from locais
+
+        *dentro do select: colocar uma opção chamada "adicionar um novo local", a opção vai direcionar o usuário 
+        para a página onde está o form de adicionar locais
+
+
+        
